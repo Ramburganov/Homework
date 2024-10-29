@@ -99,8 +99,8 @@ class Кот extends Животное {
     }
 }
 
-// Тестирование
-public class Main {
+// Основной класс для первого задания
+public class AnimalApp {
     public static void main(String[] args) {
         Кот[] коты = { new Кот(), new Кот(), new Кот() };
         Собака собака = new Собака();
