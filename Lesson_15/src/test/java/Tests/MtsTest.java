@@ -102,6 +102,8 @@ public class MtsTest {
         WebElement continueButton = driver.findElement(By.xpath("//*[@id=\"pay-connection\"]/button"));
         continueButton.click();
 
+        driver.switchTo().frame(driver.findElement(By.xpath("//iframe[@class='bepaid-iframe']")));
+
         WebElement confirmationMessage = driver.findElement(By.xpath("//div[@class='pay-description__cost']/span"));
         assertTrue(confirmationMessage.isDisplayed());
     }
