@@ -8,6 +8,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -25,7 +26,8 @@ public class MtsTest {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(80));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         driver.get("https://mts.by");
     }
     @AfterEach
@@ -102,9 +104,14 @@ public class MtsTest {
         WebElement continueButton = driver.findElement(By.xpath("//*[@id=\"pay-connection\"]/button"));
         continueButton.click();
 
+
         driver.switchTo().frame(driver.findElement(By.xpath("//iframe[@class='bepaid-iframe']")));
 
-        WebElement confirmationMessage = driver.findElement(By.xpath("//div[@class='pay-description__cost']/span"));
-        assertTrue(confirmationMessage.isDisplayed());
+        WebElement confirmationMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@class='pay-description__cost']//span[1]")));
+        String actualConfirmationMessage = confirmationMessage.getText();
+
+        System.out.println(actualConfirmationMessage + " - актуальное значение");
+
+        driver.switchTo().defaultContent();
     }
 }
