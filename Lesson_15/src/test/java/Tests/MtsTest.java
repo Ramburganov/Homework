@@ -8,6 +8,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -25,7 +26,8 @@ public class MtsTest {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(80));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(5));
         driver.get("https://mts.by");
     }
     @AfterEach
@@ -45,7 +47,7 @@ public class MtsTest {
         }
 
         WebElement paymentSection = driver.findElement(By.xpath("//section[@class='pay']//h2[contains(text(), 'Онлайн пополнение') and contains(., 'без комиссии')]"));
-                assertTrue(paymentSection.isDisplayed());
+        assertTrue(paymentSection.isDisplayed());
     }
     @Test
     public void testPaymentSectionLogos() {
@@ -102,7 +104,19 @@ public class MtsTest {
         WebElement continueButton = driver.findElement(By.xpath("//*[@id=\"pay-connection\"]/button"));
         continueButton.click();
 
-        WebElement confirmationMessage = driver.findElement(By.xpath("//div[@class='pay-description__cost']/span"));
-        assertTrue(confirmationMessage.isDisplayed());
+
+        driver.switchTo().frame(driver.findElement(By.xpath("//iframe[@class='bepaid-iframe']")));
+
+        WebElement confirmationMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@class='pay-description__cost']//span[1]")));
+        String actualConfirmationMessage = confirmationMessage.getText();
+
+        System.out.println(actualConfirmationMessage + " - актуальное значение");
+
+        driver.switchTo().frame(driver.findElement(By.xpath("//iframe[@src=\"https://pay.google.com/gp/p/ui/payframe?origin=https%3A%2F%2Fcheckout.bepaid.by&mid=\"]")));
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//button[@class='colored disabled' and .//text()[contains(., 'Оплатить 132.00 BYN')]]")));
+
+        driver.switchTo().defaultContent();
     }
 }
